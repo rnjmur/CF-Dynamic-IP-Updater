@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #imports
-import sys, requests, time, json, smtplib, logging, datetime
+import sys
 import config_info as ConfigInfo
 import cf_update as CFUpdate
 import cf_query as CFQuery
