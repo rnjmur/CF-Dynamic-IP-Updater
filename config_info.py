@@ -3,24 +3,67 @@
 import configparser
 
 class ConfigInfo:
-
+    """
+    Object to store configuration file items
+    
+    Extended description of function.
+    
+    Parameters:
+    arg1 (int): Description of arg1
+    
+    Returns:
+    int: Description of return value
+    
+    """
+    #Variable to track number of zones
     zone_count = 0
+    #default time wait
     time_wait = 300
 
     class ZoneInfo:
+        """
+        object to store config info for each zone
+        """
         def __init__(self, zone_id, bearer_token, record_id):
+            """
+            Initialize object with values
+            
+            Parameters:
+            zone_id (string): This zone's id
+            bearer_token (string): CF API Key
+            record_id (string): DNS records to update
+            """
             self.zone_id = zone_id
             self.bearer_token = bearer_token
+            # split records into list
             self.record_id = record_id.split(',')
     
     class IPCheck:
+        """
+        Object to store api key for whatsmyip.com
+        """
         def __init__(self, api_key):
+            """
+            Initialize whatismyip object
+            
+            Parameters:
+            spi_key (string): store api key
+            """
             self.api_key = api_key
     
     def __init__(self, configfile):
+        """
+        Initialize object by reading in items from the config file
+        
+        Parameters:
+        configfile (string): config file name
+        
+        """
         # Reading the keys from the configuration file
         config = configparser.ConfigParser()
         config.read(configfile)
+        
+        # Check and read in values for each config file section
         
         if 'global' in config:
             self.time_wait = config.get('global', 'time_wait')

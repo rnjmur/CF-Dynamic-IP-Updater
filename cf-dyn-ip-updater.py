@@ -11,14 +11,16 @@ If different then it will update the CloudFlare DNS and log the changes.
 
 Possible arguments:
 -h or --help:  Print this message
--q or --query:  Display zone ids
+-q or --query:  Display Cloudflare zone ids for use in config file
 -s or --service:  Use this if you are running this as a daemon
 """
 
+#Set config file name
 __configfile__ = "cfauth.ini"
 
 #Main
 if __name__ == '__main__':
+    # Create config_info object
     cf_configfile = ConfigInfo.ConfigInfo(__configfile__)
     
     #Debugging
@@ -43,10 +45,14 @@ if __name__ == '__main__':
         print(rec)
     print(cf_configfile.smtp_server)
     print(cf_configfile.smtp_port)
+    #End Debugging
+    #Check arguments
     if len(sys.argv) > 1:
+        #run continuosly as service
         if sys.argv[1] == '-s' or sys.argv[1] == '--service':
             CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile, "true")
             #pass
+        #run query to get zone ids
         elif sys.argv[1] == '-q' or sys.argv[1] == '--query':
             CFQuery.CFQuery.GetZones(cf_configfile)
     else:

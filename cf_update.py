@@ -5,10 +5,24 @@ import config_info as ConfigInfo
 import cf_logger as CFLogger
 
 class CFUpdate:
-    # Class overriding Threading.Thread
-    # Used to start a thread which sends DNS updates
+    """ Static Module with code to do CloudFlare API IP change """
     class runCFUpdate (threading.Thread):
+        """
+        Class overriding Threading.Thread used to start a thread
+        which sends DNS updates
+        """
         def __init__(self, name, zone_id, record_id, headers, payload_data):
+            """
+            Initialize thread object
+            
+            
+            Parameters:
+            name (string): a Name for the thread
+            zone_id (string): The zone_id to make changes to
+            record_id (string): The DNS record to change
+            headers (string): The authentication header
+            payload_data (string): The payload containing the ip address change
+            """
             threading.Thread.__init__(self)
             self.ThreadID = name
             self.zone_id = zone_id
@@ -17,35 +31,66 @@ class CFUpdate:
             self.headers = headers
             
         def run(self):
-            requests.patch('https://api.cloudflare.com/client/v4/zones/' + zone_id + '/dns_records?name=' + record_id, headers=headers, data=json.dumps(payload_data))
+            """ Thread code to run """
+            try:
+                requests.patch('https://api.cloudflare.com/client/v4/zones/' + zone_id + '/dns_records?name=' + record_id, headers=headers, data=json.dumps(payload_data))
+            except Exception as e:
+                CFLogger.CFLogger.WriteError("Update to CF failed!  Details: " + str(e))
+                print(e)
 
-    def CFUpdater(configfile):
+    def CFUpdater(configfile, ip_check="0"):
+        """
+        Method to check for IP changes then use CF API to update if necessary
+        
+        Parameters:
+        configfile (config_info): config_info zone object
+        ip_check (string): API key for whatismyip or 0
+        """
         # The headers we want to use
         headers = {
             'Authorization': 'Bearer ' + configfile.bearer_token, 
             'content-type': 'application/json'
             }
         
-        # Getting the initial data of your A Record
+        # Getting the initial data of the A Record
         a_record_url = requests.get('https://api.cloudflare.com/client/v4/zones/' + configfile.zone_id + '/dns_records?name=' + configfile.record_id[0], headers=headers)
         arecordjson = a_record_url.json()
         
-        # This is the current IP that your chosen A record has been set to on Cloudflare
-        current_set_ip = arecordjson['result'][0]['content']
-        
-        # This gets your current live external IP (whether that is the same as the A record or not)
-        currentip = requests.get('https://api.ipify.org?format=json')
-        
-        # Status code should be 200, otherwise the API is probably down (this can happen quite a bit)
-        ipcheck_status = currentip.status_code
-        
-        # Handling any API errors (otherwise we'd be trying to change the IP to some random HTML)
-        while ipcheck_status != 200:
-            time.sleep(60)
-            currentip = requests.get("https://api64.ipify.org?format=json")
-            ipcheck_status = currentip.status_code
-        
-        currentactualip = currentip.json()['ip']
+        # Use try to catch errors reading from CloudFlare or IP check
+        try:
+            # This is the current IP that the A record has been set to on Cloudflare
+            current_set_ip = arecordjson['result'][0]['content']
+            
+            # This gets your current live external IP (whether that is the same as the A record or not)
+            if ip_check == "0":
+                currentip = requests.get('https://api.ipify.org?format=json')
+                
+                # Status code should be 200, otherwise the API is probably down (this can happen quite a bit)
+                ipcheck_status = currentip.status_code
+                
+                # Handling any API errors (otherwise we'd be trying to change the IP to some random HTML)
+                while ipcheck_status != 200:
+                    time.sleep(60)
+                    currentip = requests.get("https://api64.ipify.org?format=json")
+                    ipcheck_status = currentip.status_code
+                currentactualip = currentip.json()['ip']
+            else:
+                currentip = requests.get('http://api.whatismyip.com/ip.php?key=' + ip_check + '&output=json')
+                
+                # Status code should be 200, otherwise the API is probably down (this can happen quite a bit)
+                ipcheck_status = currentip.status_code
+                
+                # Handling any API errors (otherwise we'd be trying to change the IP to some random HTML)
+                while ipcheck_status != 200:
+                    time.sleep(60)
+                    currentip = requests.get('http://api.whatismyip.com/ip.php?key=' + ip_check + '&output=json')
+                    ipcheck_status = currentip.status_code
+                currentactualip = check_ip.json()['ip_address'][0]['result']
+        except Exception as e:
+            CFLogger.CFLogger.WriteError("CFUpdater failed checking IP! Check that config file is correct! Details: " + str(e))
+            print(e)
+            return "false"
+
         
         if currentactualip == current_set_ip:
             print(currentactualip + " Matches " + current_set_ip)
@@ -64,7 +109,7 @@ class CFUpdate:
             #requests.patch(f"https://api.cloudflare.com/client/v4/zones/{configfile.zone_id}/dns_records/{record}", headers=headers, data=json.dumps(payload))
         
         #Log the IP change
-        CFLogger.WriteLog(current_set_ip, currentactualip)
+        CFLogger.CFLogger.WriteLog(current_set_ip, currentactualip)
         
         return false
 
@@ -74,10 +119,10 @@ class CFUpdate:
             sender = configfile.smtp_sender
             receivers = configfile.smtp_recipients
             
-            message = f"""From: Server <{configfile.smtp_sender}>
-            To: <{configfile.smtp_recipients}>
+            message = "From: Server <" + configfile.smtp_sender + """>
+            To: <""" + configfile.smtp_recipients + """>
             Subject: DNS IP Updated
-            The server's IP has changed from {current_set_ip} to {currentactualip}.
+            The server's IP has changed from """ + current_set_ip + " to " + currentactualip + """.
             The DNS records have been updated.
             """
             
