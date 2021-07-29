@@ -8,7 +8,7 @@ class CFLogger:
     """
     
     # Name of ip change log
-    __log_file__ = 'ipchanges.log'
+    __log_file__ = 'cf-updater.log'
     # format for log
     __log_format__ = '%(levelname)s :: %(message)s'
     

@@ -66,7 +66,7 @@ class ConfigInfo:
         # Check and read in values for each config file section
         
         if 'global' in config:
-            self.time_wait = config.get('global', 'time_wait')
+            self.time_wait = int(config.get('global', 'time_wait'))
         
         if 'mail' in config:
             self.smtp_enable=config.get('mail', 'enable')

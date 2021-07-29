@@ -89,13 +89,13 @@ class CFUpdate:
         except Exception as e:
             CFLogger.CFLogger.WriteError("CFUpdater failed checking IP! Check that config file is correct! Details: " + str(e))
             print(e)
-            return "false"
+            return False
 
         
         if currentactualip == current_set_ip:
             print(currentactualip + " Matches " + current_set_ip)
             # If IPs match then no need to continue
-            return "true"
+            return True
         else: # If your live IP is NOT the same as the A Record's IP
             print(currentactualip + " Doesn't Match " + current_set_ip)
             pass
@@ -111,11 +111,11 @@ class CFUpdate:
         #Log the IP change
         CFLogger.CFLogger.WriteLog(current_set_ip, currentactualip)
         
-        return false
+        return False
 
     def SendMail(configfile):
-        # Sends an email to you to let you know everything has been updated.
-        if configfile.smtp_enable == "Y":
+        """ Sends an email to you to let you know everything has been updated. """
+        if configfile.smtp_enable == "Y" or configfile.smtp_enable == "y":
             sender = configfile.smtp_sender
             receivers = configfile.smtp_recipients
             
@@ -133,31 +133,31 @@ class CFUpdate:
             smtpObj.login(configfile.smtp_un, configfile.smtp_pw)
             smtpObj.sendmail(sender, receivers, message)
 
-    def CFUpdateCheck(cf_configfile, is_service="false"):
-        if is_service == "false":
+    def CFUpdateCheck(cf_configfile, is_service=False):
+        if not is_service:
             temp_zone_counter = cf_configfile.zone_count
             if temp_zone_counter == 5:
-                if CFUpdate.CFUpdater(cf_configfile.zone_5) == "true":
+                if CFUpdate.CFUpdater(cf_configfile.zone_5):
                     return
                 else:
                     temp_zone_counter -= 1
             if temp_zone_counter == 4:
-                if CFUpdate.CFUpdater(cf_configfile.zone_4) == "true":
+                if CFUpdate.CFUpdater(cf_configfile.zone_4):
                     return
                 else:
                     temp_zone_counter -= 1
             if temp_zone_counter == 3:
-                if CFUpdate.CFUpdater(cf_configfile.zone_3) == "true":
+                if CFUpdate.CFUpdater(cf_configfile.zone_3):
                     return
                 else:
                     temp_zone_counter -= 1
             if temp_zone_counter == 2:
-                if CFUpdate.CFUpdater(cf_configfile.zone_2) == "true":
+                if CFUpdate.CFUpdater(cf_configfile.zone_2):
                     return
                 else:
                     temp_zone_counter -= 1
             if temp_zone_counter == 1:
-                if CFUpdate.CFUpdater(cf_configfile.zone_1) == "true":
+                if CFUpdate.CFUpdater(cf_configfile.zone_1):
                     return
                 else:
                     temp_zone_counter -= 1
@@ -165,34 +165,37 @@ class CFUpdate:
                         time.sleep(5)
                     CFUpdate.SendMail(cf_configfile)
         else:
-            while true:
-                time.sleep(cf_configfile.time_wait)
-                temp_zone_counter = cf_configfile.zone_count
-                if temp_zone_counter == 5:
-                    if CFUpdate.CFUpdater(cf_configfile.zone_5) == "true":
-                        continue
-                    else:
-                        temp_zone_counter -= 1
-                if temp_zone_counter == 4:
-                    if CFUpdate.CFUpdater(cf_configfile.zone_4) == "true":
-                        continue
-                    else:
-                        temp_zone_counter -= 1
-                if temp_zone_counter == 3:
-                    if CFUpdate.CFUpdater(cf_configfile.zone_3) == "true":
-                        continue
-                    else:
-                        temp_zone_counter -= 1
-                if temp_zone_counter == 2:
-                    if CFUpdate.CFUpdater(cf_configfile.zone_2) == "true":
-                        continue
-                    else:
-                        temp_zone_counter -= 1
-                if temp_zone_counter == 1:
-                    if CFUpdate.CFUpdater(cf_configfile.zone_1) == "true":
-                        continue
-                    else:
-                        temp_zone_counter -= 1
-                        while threading.activeCount() > 1:
-                            time.sleep(5)
-                        CFUpdate.SendMail(cf_configfile)
+            CFUpdate.daemonStart(cf_configfile)
+    
+    def daemonStart(cf_configfile):
+        while True:
+            time.sleep(cf_configfile.time_wait)
+            temp_zone_counter = cf_configfile.zone_count
+            if temp_zone_counter == 5:
+                if CFUpdate.CFUpdater(cf_configfile.zone_5):
+                    continue
+                else:
+                    temp_zone_counter -= 1
+            if temp_zone_counter == 4:
+                if CFUpdate.CFUpdater(cf_configfile.zone_4):
+                    continue
+                else:
+                    temp_zone_counter -= 1
+            if temp_zone_counter == 3:
+                if CFUpdate.CFUpdater(cf_configfile.zone_3):
+                    continue
+                else:
+                    temp_zone_counter -= 1
+            if temp_zone_counter == 2:
+                if CFUpdate.CFUpdater(cf_configfile.zone_2):
+                    continue
+                else:
+                    temp_zone_counter -= 1
+            if temp_zone_counter == 1:
+                if CFUpdate.CFUpdater(cf_configfile.zone_1):
+                    continue
+                else:
+                    temp_zone_counter -= 1
+                    while threading.activeCount() > 1:
+                        time.sleep(5)
+                    CFUpdate.SendMail(cf_configfile)
