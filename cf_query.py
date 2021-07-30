@@ -24,12 +24,17 @@ class CFQuery:
         try:
             # Query for zone IDs
             a_record_url = requests.get("https://api.cloudflare.com/client/v4/zones", headers=headers)
+            config_build = ""
             for record in a_record_url.json()['result']:
                 print(record['id'] + ' ' + record['name'])
+                config_build += '\n\nzone_id=' + record['id'] + '\nrecord_id='
                 dns_records = requests.get('https://api.cloudflare.com/client/v4/zones/' + record['id'] + '/dns_records', headers=headers)
                 for dns in dns_records.json()['result']:
                     print('ID: ' + dns['id'] +'   Type: ' + dns['type'] + '   Name: ' + dns['name'] + '   Content: ' + dns['content'])
+                    config_build += dns['id']
                 print()
+                print('For cfauth.ini file: \n' + config_build)
+            
         except Exception as e:
             CFLogger.CFLogger.WriteError("CFQuery failed! Check that config file is correct! Details: " + str(e))
             print (e)
