@@ -28,7 +28,7 @@ class CFQuery:
                 print(record['id'] + ' ' + record['name'])
                 dns_records = requests.get('https://api.cloudflare.com/client/v4/zones/' + record['id'] + '/dns_records', headers=headers)
                 for dns in dns_records.json()['result']:
-                    print('Type: ' + dns['type'] + '   Name: ' + dns['name'] + '   Content: ' + dns['content'])
+                    print('ID: ' + dns['id'] +'   Type: ' + dns['type'] + '   Name: ' + dns['name'] + '   Content: ' + dns['content'])
                 print()
         except Exception as e:
             CFLogger.CFLogger.WriteError("CFQuery failed! Check that config file is correct! Details: " + str(e))

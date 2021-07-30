@@ -33,7 +33,9 @@ class CFUpdate:
         def run(self):
             """ Thread code to run """
             try:
-                requests.patch('https://api.cloudflare.com/client/v4/zones/' + zone_id + '/dns_records?name=' + record_id, headers=headers, data=json.dumps(payload_data))
+                print(json.dumps(self.payload_data))
+                thread_url = requests.patch('https://api.cloudflare.com/client/v4/zones/' + self.zone_id + '/dns_records/' + self.record_id, headers=self.headers, data=json.dumps(self.payload_data))
+                print(thread_url)
             except Exception as e:
                 CFLogger.CFLogger.WriteError("Update to CF failed!  Details: " + str(e))
                 print(e)
@@ -53,13 +55,13 @@ class CFUpdate:
             }
         
         # Getting the initial data of the A Record
-        a_record_url = requests.get('https://api.cloudflare.com/client/v4/zones/' + configfile.zone_id + '/dns_records?name=' + configfile.record_id[0], headers=headers)
+        a_record_url = requests.get('https://api.cloudflare.com/client/v4/zones/' + configfile.zone_id + '/dns_records/' + configfile.record_id[0], headers=headers)
         arecordjson = a_record_url.json()
         
         # Use try to catch errors reading from CloudFlare or IP check
         try:
             # This is the current IP that the A record has been set to on Cloudflare
-            current_set_ip = arecordjson['result'][0]['content']
+            current_set_ip = arecordjson['result']['content']
             
             # This gets your current live external IP (whether that is the same as the A record or not)
             if ip_check == "0":
@@ -93,11 +95,11 @@ class CFUpdate:
 
         
         if currentactualip == current_set_ip:
-            print(currentactualip + " Matches " + current_set_ip)
             # If IPs match then no need to continue
+            print('Current IP ' + currentactualip + ' matches ' + current_set_ip)
             return True
         else: # If your live IP is NOT the same as the A Record's IP
-            print(currentactualip + " Doesn't Match " + current_set_ip)
+            print('Current IP ' + currentactualip + ' does not match ' + current_set_ip)
             pass
         
         # The "Payload" is what we want to change in the DNS record JSON (in this case, it's our IP)
@@ -105,7 +107,7 @@ class CFUpdate:
         
         # Change the IP using a PATCH request
         for record in configfile.record_id:
-            CFUpdate.runCFUpdate(configfile.zone_id + record, configfile.zone_id, record, payload).start()
+            CFUpdate.runCFUpdate(configfile.zone_id + record, configfile.zone_id, record, headers, payload).start()
             #requests.patch(f"https://api.cloudflare.com/client/v4/zones/{configfile.zone_id}/dns_records/{record}", headers=headers, data=json.dumps(payload))
         
         #Log the IP change
