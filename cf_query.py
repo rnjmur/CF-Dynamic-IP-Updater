@@ -31,9 +31,13 @@ class CFQuery:
                 dns_records = requests.get('https://api.cloudflare.com/client/v4/zones/' + record['id'] + '/dns_records', headers=headers)
                 for dns in dns_records.json()['result']:
                     print('ID: ' + dns['id'] +'   Type: ' + dns['type'] + '   Name: ' + dns['name'] + '   Content: ' + dns['content'])
-                    config_build += dns['id']
+                    if dns['type'] == "A":
+                        config_build += dns['id']
+                        config_build += ","
                 print()
-                print('For cfauth.ini file: \n' + config_build)
+                config_build = config_build[:-1]
+            print()
+            print('For cfauth.ini file: \n' + config_build)
             
         except Exception as e:
             CFLogger.CFLogger.WriteError("CFQuery failed! Check that config file is correct! Details: " + str(e))
