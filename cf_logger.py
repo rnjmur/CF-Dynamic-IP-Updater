@@ -12,8 +12,14 @@ class CFLogger:
     # format for log
     __log_format__ = '%(levelname)s :: %(message)s'
     
-    # Setting up the logger (a file where it records all IP changes)
-    logging.basicConfig(level=logging.INFO, filename=__log_file__, format=__log_format__)
+    try:
+        # Setting up the logger (a file where it records all IP changes)
+        logging.basicConfig(level=logging.INFO, filename=__log_file__, format=__log_format__)
+    
+    except PermissionError as e:
+        print("Log file could not be opened!! " +str(e))
+        # Terminate program since logs cannot be written
+        exit()
     
     def WriteLog(old_ip, new_ip):
         """
