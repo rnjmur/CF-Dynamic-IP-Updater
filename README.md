@@ -1,3 +1,4 @@
+<meta name="google-site-verification" content="lMZa9jgPf1qCN63zH2dgLit8pIng3ay_tWFRDvPo0r8" />
 # CF-Dynamic-IP-Updater
 
 Use cloudflare API to update IPs when Dynamic IP changes
