@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-site-verification" content="lMZa9jgPf1qCN63zH2dgLit8pIng3ay_tWFRDvPo0r8">
+
+<!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>CF-Dynamic-IP-Updater | Use cloudflare API to update IPs when Dynamic IP changes</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="CF-Dynamic-IP-Updater" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Use cloudflare API to update IPs when Dynamic IP changes" />
+<meta property="og:description" content="Use cloudflare API to update IPs when Dynamic IP changes" />
+<link rel="canonical" href="https://rnjmur.github.io/CF-Dynamic-IP-Updater/" />
+<meta property="og:url" content="https://rnjmur.github.io/CF-Dynamic-IP-Updater/" />
+<meta property="og:site_name" content="CF-Dynamic-IP-Updater" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="CF-Dynamic-IP-Updater" />
+<script type="application/ld+json">
+{"description":"Use cloudflare API to update IPs when Dynamic IP changes","url":"https://rnjmur.github.io/CF-Dynamic-IP-Updater/","@type":"WebSite","headline":"CF-Dynamic-IP-Updater","name":"CF-Dynamic-IP-Updater","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/CF-Dynamic-IP-Updater/assets/css/style.css?v=f6751bf042758297409919fd937061807a62f5b6">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/CF-Dynamic-IP-Updater/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+
+      <h1 id="cf-dynamic-ip-updater">CF-Dynamic-IP-Updater</h1>
+
+<p>Use cloudflare API to update IPs when Dynamic IP changes</p>
+
+<p>Python3 is required.  The tool currently only works with API tokens but I am working to add the ability to use API keys as well.</p>
+
+<p>This tool will update your cloudflare A records whenever a dynamic IP address change is detected.</p>
+
+<p>Simply add your cloudflare info into the cfauth.ini file and then run the cf-dyn-ip-updater.py file.  Make sure your generated API token has DNS edit rights configured properly for your zones or the updates will not work.</p>
+
+<p>If you run cf-dyn-ip-updater.py -q or cf-dyn-ip-updater.py –query it will use the cloudflare API token configured in zone1 and run a query returning a list of all zone and record ids available.  For the query to work properly you must use an API token that has at least read permission for ALL zones.  The query will print out the cfauth.ini zone_id and record_id configuration so that you can copy and paste it into the cfauth.ini file.</p>
+
+
+      
+      <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
+        This site is open source. <a href="https://github.com/rnjmur/CF-Dynamic-IP-Updater/edit/main/README.md">Improve this page</a>.
+      </div>
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>
