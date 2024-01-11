@@ -45,9 +45,11 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         #set config file
         if '-c:' in sys.argv[1]:
+            del cf_configfile
             cf_configfile = ConfigInfo.ConfigInfo(sys.argv[1][3:])
             CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile)
         elif '--config:' in sys.argv[1]:
+            del cf_configfile
             cf_configfile = ConfigInfo.ConfigInfo(sys.argv[1][9:])
             CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile)
         #run continuosly as service
@@ -63,8 +65,10 @@ if __name__ == '__main__':
     elif len(sys.argv) == 3:
         for arg in sys.argv:
             if '-c:' in arg:
+                del cf_configfile
                 cf_configfile = ConfigInfo.ConfigInfo(arg[3:])
             elif '--config:' in arg:
+                del cf_configfile
                 cf_configfile = ConfigInfo.ConfigInfo(arg[9:])
         for arg2 in sys.argv:
             #run continuosly as service

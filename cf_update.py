@@ -108,6 +108,14 @@ class CFUpdate:
             CFUpdate.runCFUpdate(zone.zone_id + record, zone.zone_id, record, headers, payload).start()
             #requests.patch(f"https://api.cloudflare.com/client/v4/zones/{zone.zone_id}/dns_records/{record}", headers=headers, data=json.dumps(payload))
         
+        if not zone.custom_id == "":
+            dns_records = requests.get('https://api.cloudflare.com/client/v4/zones/' + zone.zone_id + '/dns_records', headers=headers)
+            for dns in dns_records.json()['result']:
+                for custom_record in zone.custom_id:
+                    if dns['id'] == custom_record:
+                        cust_payload = {'content': dns['content'].replace(current_set_ip, currentactualip)}
+                        CFUpdate.runCFUpdate(zone.zone_id + custom_record, zone.zone_id, custom_record, headers, cust_payload).start()
+        
         #Log the IP change
         CFLogger.CFLogger.WriteLog(current_set_ip, currentactualip)
         
