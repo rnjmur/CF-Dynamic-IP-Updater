@@ -9,7 +9,7 @@ import cf_query as CFQuery
 __author__ = 'RNJMUR'
 __credits__ = ['RNJMUR']
 __license__ = 'GPL 3.0'
-__version__ = '0.80'
+__version__ = '0.90'
 __maintainer__ = 'RNJMUR'
 __email__ = 'rnjmur@hotmail.com'
 __status__ = 'Beta'
@@ -30,6 +30,7 @@ Possible arguments:
 -h or --help:  Print this message
 -q or --query:  Display Cloudflare zone ids for use in config file
 -s or --service:  Use this if you are running this as a service
+-c:<filename> or --config:<filename>:  Use this config file instead of default cfauth.ini
 """
 
 #Set config file name
@@ -40,42 +41,45 @@ if __name__ == '__main__':
     # Create config_info object
     cf_configfile = ConfigInfo.ConfigInfo(__configfile__)
     
-    #Debugging
-    print(__help__)
-    print('Time wait Variable')
-    print(cf_configfile.time_wait)
-    print('Check IP value')
-    print(cf_configfile.check_ip.api_key)
-    print('zone count')
-    print(cf_configfile.zone_count)
-    print('print Zone ID')
-    print(cf_configfile.zone_1.zone_id)
-    print('print Bearer Token')
-    print(cf_configfile.zone_1.bearer_token)
-    print('print Records')
-    print(cf_configfile.zone_1.record_id)
-    print('print each record individually')
-    for record in cf_configfile.zone_1.record_id:
-        print(record)
-    print(cf_configfile.smtp_enable)
-    for rec in cf_configfile.smtp_recipients:
-        print(rec)
-    print(cf_configfile.smtp_server)
-    print(cf_configfile.smtp_port)
-    #End Debugging
     #Check arguments
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 2:
+        #set config file
+        if '-c:' in sys.argv[1]:
+            cf_configfile = ConfigInfo.ConfigInfo(sys.argv[1][3:])
+            CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile)
+        elif '--config:' in sys.argv[1]:
+            cf_configfile = ConfigInfo.ConfigInfo(sys.argv[1][9:])
+            CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile)
         #run continuosly as service
-        if sys.argv[1] == '-s' or sys.argv[1] == '--service':
+        elif sys.argv[1] == '-s' or sys.argv[1] == '--service':
             CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile, True)
-            #pass
         #run query to get zone ids
         elif sys.argv[1] == '-q' or sys.argv[1] == '--query':
             CFQuery.CFQuery.GetZones(cf_configfile)
-        elif sys.argv[1] == '-h' or sys.argv[1] == '--help':
+        #display help
+        else:
             print(__prog_info__)
             print(__help__)
+    elif len(sys.argv) == 3:
+        for arg in sys.argv:
+            if '-c:' in arg:
+                cf_configfile = ConfigInfo.ConfigInfo(arg[3:])
+            elif '--config:' in arg:
+                cf_configfile = ConfigInfo.ConfigInfo(arg[9:])
+        for arg2 in sys.argv:
+            #run continuosly as service
+            if arg2 == '-s' or arg2 == '--service':
+                CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile, True)
+            #run query to get zone ids
+            elif arg2 == '-q' or arg2 == '--query':
+                CFQuery.CFQuery.GetZones(cf_configfile)
+            #display help
+            elif arg2 == '-h' or arg2 == '--help':
+                print(__prog_info__)
+                print(__help__)
+    elif len(sys.argv) > 3:
+        print("Too Many Arguments given!  See help below for proper syntax:\n")
+        print(__help__)
     else:
         CFUpdate.CFUpdate.CFUpdateCheck(cf_configfile)
-        #pass
     

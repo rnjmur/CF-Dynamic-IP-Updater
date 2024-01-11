@@ -6,13 +6,9 @@ class ConfigInfo:
     """
     Object to store configuration file items
     
-    Extended description of function.
-    
-    Parameters:
-    arg1 (int): Description of arg1
-    
-    Returns:
-    int: Description of return value
+    Configuration Data is stored using two data nodes.
+    Data Node 1 (ZoneInfo) stores the Cloudflare Zone ID, bearer token, and a list of the DNS records to update
+    Data Node 2 (IPCheck) stores the whatismyip api key
     
     """
     #Variable to track number of zones
@@ -32,6 +28,7 @@ class ConfigInfo:
             zone_id (string): This zone's id
             bearer_token (string): CF API Key
             record_id (string): DNS records to update
+            zone_list (list): List of Zone Nodes
             """
             self.zone_id = zone_id
             self.bearer_token = bearer_token
@@ -63,6 +60,9 @@ class ConfigInfo:
         config = configparser.ConfigParser()
         config.read(configfile)
         
+        # Create Placeholder list for zones
+        self.zone_list = []
+        
         # Check and read in values for each config file section
         
         if 'global' in config:
@@ -84,23 +84,53 @@ class ConfigInfo:
         
         if 'zone_1' in config:
             self.zone_1 = self.ZoneInfo(config.get('zone_1', 'zone_id'), config.get('zone_1', 'bearer_token'), config.get('zone_1', 'record_id'))
+            self.zone_list.append(self.zone_1)
             self.zone_count += 1
         
         if 'zone_2' in config:
             self.zone_2 = self.ZoneInfo(config.get('zone_2', 'zone_id'), config.get('zone_2', 'bearer_token'), config.get('zone_2', 'record_id'))
+            self.zone_list.append(self.zone_2)
             self.zone_count += 1
         
         if 'zone_3' in config:
             self.zone_3 = self.ZoneInfo(config.get('zone_3', 'zone_id'), config.get('zone_3', 'bearer_token'), config.get('zone_3', 'record_id'))
+            self.zone_list.append(self.zone_3)
             self.zone_count += 1
         
         if 'zone_4' in config:
             self.zone_4 = self.ZoneInfo(config.get('zone_4', 'zone_id'), config.get('zone_4', 'bearer_token'), config.get('zone_4', 'record_id'))
+            self.zone_list.append(self.zone_4)
             self.zone_count += 1
         
         if 'zone_5' in config:
             self.zone_5 = self.ZoneInfo(config.get('zone_5', 'zone_id'), config.get('zone_5', 'bearer_token'), config.get('zone_5', 'record_id'))
+            self.zone_list.append(self.zone_5)
             self.zone_count += 1
         
+        if 'zone_6' in config:
+            self.zone_6 = self.ZoneInfo(config.get('zone_6', 'zone_id'), config.get('zone_6', 'bearer_token'), config.get('zone_6', 'record_id'))
+            self.zone_list.append(self.zone_6)
+            self.zone_count += 1
+        
+        if 'zone_7' in config:
+            self.zone_7 = self.ZoneInfo(config.get('zone_7', 'zone_id'), config.get('zone_7', 'bearer_token'), config.get('zone_7', 'record_id'))
+            self.zone_list.append(self.zone_7)
+            self.zone_count += 1
+        
+        if 'zone_8' in config:
+            self.zone_5 = self.ZoneInfo(config.get('zone_8', 'zone_id'), config.get('zone_8', 'bearer_token'), config.get('zone_8', 'record_id'))
+            self.zone_list.append(self.zone_8)
+            self.zone_count += 1
+        
+        if 'zone_9' in config:
+            self.zone_9 = self.ZoneInfo(config.get('zone_9', 'zone_id'), config.get('zone_9', 'bearer_token'), config.get('zone_9', 'record_id'))
+            self.zone_list.append(self.zone_9)
+            self.zone_count += 1
+        
+        if 'zone_10' in config:
+            self.zone_10 = self.ZoneInfo(config.get('zone_10', 'zone_id'), config.get('zone_10', 'bearer_token'), config.get('zone_10', 'record_id'))
+            self.zone_list.append(self.zone_10)
+            self.zone_count += 1
 
-    
+    def GetZoneList(self):
+        return self.zone_list
