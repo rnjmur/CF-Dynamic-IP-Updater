@@ -9,10 +9,10 @@ import cf_query as CFQuery
 __author__ = 'RNJMUR'
 __credits__ = ['RNJMUR']
 __license__ = 'GPL 3.0'
-__version__ = '0.90'
+__version__ = '1.00'
 __maintainer__ = 'RNJMUR'
 __email__ = 'rnjmur@hotmail.com'
-__status__ = 'Beta'
+__status__ = 'Production'
 
 __prog_info__ = "\nAuthor: " + __author__ + \
         "\nCredits: " + "".join(__credits__) + \
