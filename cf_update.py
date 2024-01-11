@@ -40,24 +40,23 @@ class CFUpdate:
                 CFLogger.CFLogger.WriteError("Update to CF failed!  Details: " + str(e))
                 print(e)
 
-    def CFUpdater(configfile, ip_check="0"):
+    def CFUpdater(zone, ip_check="0"):
         """
         Method to check for IP changes then use CF API to update if necessary
         
         Parameters:
-        configfile (config_info): config_info zone object
+        zone (config_info): config_info zone object
         ip_check (string): API key for whatismyip or 0
         """
         # The headers we want to use
         headers = {
-            'Authorization': 'Bearer ' + configfile.bearer_token, 
+            'Authorization': 'Bearer ' + zone.bearer_token, 
             'content-type': 'application/json'
             }
         
         # Getting the initial data of the A Record
-        a_record_url = requests.get('https://api.cloudflare.com/client/v4/zones/' + configfile.zone_id + '/dns_records/' + configfile.record_id[0], headers=headers)
+        a_record_url = requests.get('https://api.cloudflare.com/client/v4/zones/' + zone.zone_id + '/dns_records/' + zone.record_id[0], headers=headers)
         arecordjson = a_record_url.json()
-        
         # Use try to catch errors reading from CloudFlare or IP check
         try:
             # This is the current IP that the A record has been set to on Cloudflare
@@ -100,15 +99,14 @@ class CFUpdate:
             return True
         else: # If your live IP is NOT the same as the A Record's IP
             print('Current IP ' + currentactualip + ' does not match ' + current_set_ip)
-            pass
         
         # The "Payload" is what we want to change in the DNS record JSON (in this case, it's our IP)
         payload = {'content': currentactualip}
         
         # Change the IP using a PATCH request
-        for record in configfile.record_id:
-            CFUpdate.runCFUpdate(configfile.zone_id + record, configfile.zone_id, record, headers, payload).start()
-            #requests.patch(f"https://api.cloudflare.com/client/v4/zones/{configfile.zone_id}/dns_records/{record}", headers=headers, data=json.dumps(payload))
+        for record in zone.record_id:
+            CFUpdate.runCFUpdate(zone.zone_id + record, zone.zone_id, record, headers, payload).start()
+            #requests.patch(f"https://api.cloudflare.com/client/v4/zones/{zone.zone_id}/dns_records/{record}", headers=headers, data=json.dumps(payload))
         
         #Log the IP change
         CFLogger.CFLogger.WriteLog(current_set_ip, currentactualip)
@@ -134,70 +132,24 @@ class CFUpdate:
             smtpObj.starttls()
             smtpObj.login(configfile.smtp_un, configfile.smtp_pw)
             smtpObj.sendmail(sender, receivers, message)
-
+    
+    def ParseZones(cf_configfile):
+        for zone in cf_configfile.GetZoneList():
+            if cf_configfile.check_ip.api_key == '0':
+                CFUpdate.CFUpdater(zone)
+            else:
+                CFUpdate.CFUpdater(zone, cf_configfile.check_ip.api_key)
+    
     def CFUpdateCheck(cf_configfile, is_service=False):
         if not is_service:
-            temp_zone_counter = cf_configfile.zone_count
-            if temp_zone_counter == 5:
-                if CFUpdate.CFUpdater(cf_configfile.zone_5):
-                    return
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 4:
-                if CFUpdate.CFUpdater(cf_configfile.zone_4):
-                    return
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 3:
-                if CFUpdate.CFUpdater(cf_configfile.zone_3):
-                    return
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 2:
-                if CFUpdate.CFUpdater(cf_configfile.zone_2):
-                    return
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 1:
-                if CFUpdate.CFUpdater(cf_configfile.zone_1):
-                    return
-                else:
-                    temp_zone_counter -= 1
-                    while threading.activeCount() > 1:
-                        time.sleep(5)
-                    CFUpdate.SendMail(cf_configfile)
+            CFUpdate.ParseZones(cf_configfile)
         else:
             CFUpdate.daemonStart(cf_configfile)
     
     def daemonStart(cf_configfile):
         while True:
             time.sleep(cf_configfile.time_wait)
-            temp_zone_counter = cf_configfile.zone_count
-            if temp_zone_counter == 5:
-                if CFUpdate.CFUpdater(cf_configfile.zone_5):
-                    continue
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 4:
-                if CFUpdate.CFUpdater(cf_configfile.zone_4):
-                    continue
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 3:
-                if CFUpdate.CFUpdater(cf_configfile.zone_3):
-                    continue
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 2:
-                if CFUpdate.CFUpdater(cf_configfile.zone_2):
-                    continue
-                else:
-                    temp_zone_counter -= 1
-            if temp_zone_counter == 1:
-                if CFUpdate.CFUpdater(cf_configfile.zone_1):
-                    continue
-                else:
-                    temp_zone_counter -= 1
-                    while threading.activeCount() > 1:
-                        time.sleep(5)
-                    CFUpdate.SendMail(cf_configfile)
+            CFUpdate.ParseZones(cf_configfile)
+            if threading.activeCount() > 1:
+                time.sleep(5)
+            #CFUpdate.SendMail(cf_configfile)
