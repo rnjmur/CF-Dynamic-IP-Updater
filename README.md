@@ -10,10 +10,10 @@ Simply add your cloudflare info into the cfauth.ini file and then run the cf-dyn
 
 If you run cf-dyn-ip-updater.py -q or cf-dyn-ip-updater.py --query it will use the cloudflare API tokens configured for each zone and run a query returning a list of all zone and record ids available.  For the query to work properly you must use an API token that has at least read permission for ALL zones.  The query will print out the cfauth.ini zone_id, bearer token, and record_id configuration so that you can copy and paste it into the cfauth.ini file.
 
-Prerequisites:
-Python 3.8 or higher
-pip install requests
-Cloudflare Global API Key
+Prerequisites:  
+Python 3.8 or higher  
+pip install requests  
+Cloudflare Global API Key  
 
 Additional info can be found in the Wiki.
 
